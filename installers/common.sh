@@ -2,7 +2,7 @@ raspap_dir="/etc/raspap"
 raspap_user="www-data"
 version=`sed 's/\..*//' /etc/debian_version`
 
-# Determine version and set default home location for lighttpd 
+# Determine version and set default home location for lighttpd
 if [ $version -ge 8 ]; then
     echo "Raspian verison is 8.0 or later"
     webroot_dir="/var/www/html"
@@ -27,20 +27,7 @@ function install_error() {
 
 function config_installation() {
     install_log "Configure installation"
-    # This causes confusion. For the moment fix the default.
-    #echo -n "Install directory [${raspap_dir}]: "
-    #read input
-    #if [ ! -z "$input" ]; then
-    #    raspap_dir="$input"
-    #fi
-    echo "Install directory: ${raspap_dir}"
-
-    echo -n "Complete installation with these values? [y/N]: "
-    read answer
-    if [[ $answer != "y" ]]; then
-        echo "Installation aborted."
-        exit 0
-    fi
+    echo -n "Install directory: ${raspap_dir}"
 }
 
 # Runs a system software update to make sure we're using all fresh packages
@@ -60,7 +47,6 @@ function enable_php_lighttpd() {
     install_log "Enabling PHP for lighttpd"
 
     sudo lighty-enable-mod fastcgi-php || install_error "Cannot enable fastcgi-php for lighttpd"
-    sudo /etc/init.d/lighttpd restart || install_error "Unable to restart lighttpd"
 }
 
 # Verifies existence and permissions of RaspAP directory
@@ -81,7 +67,7 @@ function download_latest_files() {
     fi
 
     install_log "Cloning latest files from github"
-    git clone https://github.com/billz/raspap-webgui /tmp/raspap-webgui || install_error "Unable to download files from github"
+    git clone https://github.com/shaduzlabs/raspap-webgui /tmp/raspap-webgui || install_error "Unable to download files from github"
     sudo mv /tmp/raspap-webgui $webroot_dir || install_error "Unable to move raspap-webgui to web root"
 }
 
@@ -148,14 +134,6 @@ function patch_system_files() {
 
 function install_complete() {
     install_log "Installation completed!"
-    
-    echo -n "The system needs to be rebooted as a final step. Reboot now? [y/N]: "
-    read answer
-    if [[ $answer != "y" ]]; then
-        echo "Installation aborted."
-        exit 0
-    fi
-    sudo shutdown -r now || install_error "Unable to execute shutdown"
 }
 
 function install_raspap() {
